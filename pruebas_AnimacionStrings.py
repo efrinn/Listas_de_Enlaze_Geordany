@@ -1,6 +1,6 @@
 import time
 import sys
-
+import threading as thr
 def mecanografiar(texto):
     """La funcion recibe un  argumento , el texto que quieras mecanografiar(que  debe ser una cadena)"""
     lista = texto.split() #Separa el texto en una lista de palabras
@@ -23,8 +23,24 @@ mecanografiar2("Saliendo ....")
 
 def mecanografiaBucle(texto):
     """Hacer un bucle de efecto de maquina de escribir"""
-    while True:
+    detener = False  #Variable de control que detiene el bucle
+
+    def esperar_input():
+        nonlocal detener #modificamos la variable externa y la hacemos interna con nonlocal
+        input(" Presiona Enter para Salir ")
+        detener = True #Cambia la variable detener a True para detener el efecto de mecanografia
+    
+    hilo = thr.Thread(target=esperar_input) #Crea un hilo para esperar la entrada del usuario
+    hilo.start() #Inicia el hilo
+    """ Nota mental : No se puede usar el hilo en la funcion principal porque el hilo no se detiene y el programa no termina
+    se queda esperando la entrada del usuario y el hilo no se detiene
+    por eso se usa un bucle while para esperar la entrada del usuario y el hilo se detiene cuando se recibe la entrada
+    """
+    #Ultima nota mental , los hilos segun su uso estan bastante rotos ( son muy utiles o muy buenos al uso practico)
+    while not detener:
         for letra in texto:
+            if detener:
+                break
             sys.stdout.write(letra) #Escribe la letra en la consola
             sys.stdout.flush()
             time.sleep(0.1) #Espera 0.1 segundos antes de escribir la siguiente letra
